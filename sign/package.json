@@ -1,0 +1,9 @@
+{
+  "name": "skiff-sign",
+  "private": true,
+  "type": "module",
+  "description": "Skiff wallet + signing layer: ES modules for the page. No dependencies (noble files vendored in vendor/).",
+  "scripts": {
+    "live48": "node test/live48.mjs"
+  }
+}

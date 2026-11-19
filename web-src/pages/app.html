@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="en">
+<head>
+<!--@head page="app" path="/app"-->
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Swap · Skiff</title>
+<meta name="description" content="Swap into stock tokens on Robinhood Chain. See every venue, the split by pool and every fee before you sign.">
+<meta name="theme-color" content="#001413">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Skiff">
+<meta property="og:title" content="Swap · Skiff">
+<meta property="og:description" content="Swap into stock tokens on Robinhood Chain. See every venue, the split by pool and every fee before you sign.">
+<meta property="og:url" content="__SITE_URL__/app">
+<meta property="og:image" content="__SITE_URL__/assets/brand/og.png">
+<meta property="og:image:alt" content="The Skiff swap with venues compared on one block">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Swap · Skiff">
+<meta name="twitter:description" content="Swap into stock tokens on Robinhood Chain. See every venue, the split by pool and every fee before you sign.">
+<link rel="icon" href="/assets/brand/mark-skiff.svg" type="image/svg+xml">
+<link rel="preload" href="/assets/fonts/dm-sans-latin-var.woff2" as="font" type="font/woff2" crossorigin><link rel="preload" href="/assets/fonts/geist-latin-var.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/assets/css/skiff.css?v=b0e14dfe88">
+<!--/@-->
+<script type="module" src="/assets/js/app.js?v=b0e14dfe88"></script>
+</head>
+<body class="app v2" data-view="swap">
+<div class="amb2" style="position:absolute;inset:0 0 auto;height:100vh" aria-hidden="true"><i class="glow"></i><i class="grain"></i></div>
+<div class="wrap">
+  <!--@header variant="app" active="swap"-->
+<a class="skip" href="#swap">Skip to swap</a><header class="nav"><a class="brand" href="/" aria-label="Skiff"><img class="bm" src="/assets/brand/mark-skiff.svg" alt="" width="32" height="32"><img class="bw" src="/assets/brand/wordmark-skiff.svg" alt="Skiff" width="55" height="22"></a><button class="cmdbar" data-cmdk><svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true"><circle cx="8" cy="8" r="5.5" stroke="currentColor" stroke-width="1.6"/><path d="m12.2 12.2 3.3 3.3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg><span>Buy a stock, search a token, paste an address</span><span class="kbd">⌘ K</span></button><div class="rt"><span class="chain"><img src="/assets/brand/robinhood-chain.svg" alt="" width="22" height="22">Robinhood Chain<span class="dot"></span><span class="blk mono" data-blk></span></span><button class="qbtn" data-connect>Connect wallet</button><button class="menu-b" aria-label="Menu" aria-expanded="false" data-menu><svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true"><path d="M3 6h12M3 12h12" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg></button></div><nav class="mnav" aria-label="Menu"><a href="/app">Swap</a><a href="/stocks">Stocks</a><a href="/app#trades">Big trades</a><a href="/faq">FAQ</a></nav></header>
+<!--/@-->
+  <h1 class="sr" data-s="nav.swap"></h1>
+  <main>
+    <div class="app2 cols">
+      <div class="colL">
+        <section class="swc" aria-label="Swap"><div id="swap" class="sw"></div><p class="geo" data-s="common.geo"></p></section>
+        <section class="you lowsec" id="you">
+          <div class="ytabs" role="tablist"><button role="tab" aria-controls="ybox" data-y="watchlist" class="on" data-s="app.nav.watchlist"></button><button role="tab" aria-controls="ybox" data-y="history" data-s="app.history.title"></button></div>
+          <div class="ybox" id="ybox" role="tabpanel"></div>
+        </section>
+      </div>
+      <div class="colR">
+        <div class="stgw"><section class="stage2" id="stage" aria-live="off">
+          <div class="stg-h"><h2 id="stgT">&nbsp;</h2><span id="stgS"></span></div>
+          <div class="pane2" id="pIdle"><p class="lline2" id="iline">&nbsp;</p><p class="lstamp2" id="istamp">&nbsp;</p><div id="iSch" class="schw"></div></div>
+          <div class="pane2" id="pRace" hidden></div>
+          <div class="pane2" id="pTrack" hidden></div>
+        </section></div>
+        <section id="trades" aria-labelledby="trt" class="lowsec">
+          <div class="cardh"><h3 id="trt" data-s="app.trades.title"></h3><span class="meta" data-s="app.trades.stamp"></span></div>
+          <div class="chips" id="trf"></div>
+          <div class="trh" aria-hidden="true"><span></span><span data-s="app.trades.cols.stock"></span><span data-s="app.trades.cols.side"></span><span data-s="app.trades.cols.venue"></span><span data-s="app.trades.cols.usd"></span><span></span></div>
+          <div id="trl"></div>
+          <p class="bnote" data-s="app.trades.note"></p>
+        </section>
+      </div>
+    </div>
+  </main>
+</div>
+<!--@footer-->
+<!--/@-->
+<!--@dock active="swap" app="1"-->
+<!--/@-->
+</body>
+</html>

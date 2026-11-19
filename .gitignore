@@ -1,0 +1,15 @@
+.env
+.env.*
+!.env.example
+data/
+*.db
+*.db-wal
+*.db-shm
+*.log
+__pycache__/
+*.pyc
+.venv/
+node_modules/
+privy/dist/
+engine/site_url.txt
+.DS_Store

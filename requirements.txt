@@ -1,0 +1,8 @@
+# Direct dependencies of the engine (same versions as the local .venv, 16.11.2026). The image installs requirements-lock.txt (hash-locked),
+# generated from this file with pip-compile inside the pinned python:3.12 base (see the lock's header). uvloop + httptools = what
+# uvicorn[standard] uses at runtime; watchfiles/websockets/dotenv/pyyaml are not needed (no reload, no websockets).
+fastapi==0.141.1
+uvicorn==0.52.4
+uvloop==0.23.0
+httptools==0.9.0
+PyJWT[crypto]==2.10.1

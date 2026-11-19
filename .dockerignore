@@ -1,0 +1,14 @@
+# Allowlist: the image gets ONLY the engine, the built front end and the hash-locked dependency list.
+# Everything else stays out by default: .env, .venv, data/ (base, replay, logs), privy/ (node_modules = 1.2 GB), sign/ (sources + tests),
+# web-src/, tools/, deploy/, run.sh.
+*
+!engine/
+!web/
+!requirements-lock.txt
+**/__pycache__
+**/*.pyc
+**/.DS_Store
+**/.env
+**/.env.*
+**/*.map
+**/node_modules

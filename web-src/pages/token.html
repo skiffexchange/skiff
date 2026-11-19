@@ -1,0 +1,140 @@
+<!doctype html>
+<html lang="en">
+<head>
+<!--design: /token «Vault» (18.11). Decision → Refero UUID; full ledger in design/TOKEN-PAGE.md.
+  site language (canvas, panels, light, radius scale)  Auros style 16b5f8b3-9704-4b0f-99e3-246ea8a05dc2; X web UI 477afb69 (pill / 22 / 14)
+  H1/H2 Geist                                           Gemini style 582065f5, Codex 648e22f5 (as every page, SPEC §22)
+  hero: promise left, live vault dial right              Coinbase «My assets» empty, dark 8c647845-9934-4cb3-9cdb-1de076df6d82 (big balance panel first)
+  vault = ONE balance line (USDG icon · label · big number) Coinbase «My assets» total-balance panel 8c647845 (one number, big, first)
+  empty vault = ghost value + one plain line, no fake rows Kraken History/Ledger empty state 421b82f6-dfac-4608-b332-a180faeb0b7e
+  USDG → stock tokens flow strip (what the weekly buy does) Auros «connected matter» 16b5f8b3 (light nodes joined by one line)
+  og card /assets/brand/og-token.png                     site og (x/og) family + Coinbase 8c647845; source design/og-token/og-token.html
+  week log as a public audit trail                       Kraken Audits (proof of reserves) 641358fd-bbcd-4e39-8324-47cf21177252
+  vault address row + copy, CA with copy                 Coinbase crypto addresses daabf72c-625c-4728-923b-8bf5b628742f
+  check an address: one field + one button inline        Family send / paste address 120d0b42-a08e-40d1-a672-3af9b3c2807f
+  timer as big tabular numbers in tiles                  Clay KPI metrics, dark 8333b544-fbd2-48ce-83ed-27401f108659
+-->
+<!--@head page="token" path="/token"-->
+<!--/@-->
+<script type="module" src="/assets/js/vault.js"></script>
+</head>
+<body class="v2 plain vaultp" data-ca="0" data-vault="0" data-drop="0">
+<div class="hero" style="position:absolute;inset:0 0 auto;height:100vh;padding:0" aria-hidden="true"><div class="amb"><i class="l1"></i><i class="l2"></i><i class="l3"></i><i class="grain"></i></div></div>
+<div class="wrap">
+  <!--@header variant="site" active="token"-->
+<!--/@-->
+  <main class="page vlt" id="swap">
+    <section class="vh">
+      <div class="vh-t">
+        <p class="eyb vey"><img src="/assets/brand/mark-skiff.svg" alt="" width="18" height="18"><span data-s="token.hero.eyebrow"></span></p>
+        <h1 data-s="token.hero.title"></h1>
+        <p class="ld" data-s="token.hero.sub"></p>
+        <p class="vzero"><svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true"><circle cx="9" cy="9" r="7.25" stroke="currentColor" stroke-width="1.5"/><path d="m5.8 9.2 2.2 2.2 4.3-4.6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg><span data-s="token.hero.zero"></span></p>
+        <div class="vbuy">
+          <a class="btn-p ca-only" href="/app?to={ca}" data-s="token.buy.cta"></a>
+          <p class="vpre no-ca"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><rect x="3" y="7" width="10" height="7" rx="2" stroke="currentColor" stroke-width="1.4"/><path d="M5.5 7V5a2.5 2.5 0 0 1 5 0v2" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg><span data-s="token.buy.prelaunch"></span></p>
+        </div>
+      </div>
+      <div class="vdial" aria-hidden="true">
+        <i class="vr1"></i><i class="vr2"></i><i class="vr3"></i><i class="vdots"></i>
+        <div class="vorb">
+          <i class="vsl" style="--a:0deg"><span class="stk"><img src="/assets/logos/stocks/NVDA.png" alt="" width="44" height="44"></span></i>
+          <i class="vsl" style="--a:45deg"><span class="stk"><img src="/assets/logos/stocks/SPY.png" alt="" width="44" height="44"></span></i>
+          <i class="vsl" style="--a:90deg"><span class="stk"><img src="/assets/logos/stocks/TSLA.png" alt="" width="44" height="44"></span></i>
+          <i class="vsl" style="--a:135deg"><span class="stk"><img src="/assets/logos/stocks/AAPL.png" alt="" width="44" height="44"></span></i>
+          <i class="vsl" style="--a:180deg"><span class="stk"><img src="/assets/logos/stocks/QQQ.png" alt="" width="44" height="44"></span></i>
+          <i class="vsl" style="--a:225deg"><span class="stk"><img src="/assets/logos/stocks/MSFT.png" alt="" width="44" height="44"></span></i>
+          <i class="vsl" style="--a:270deg"><span class="stk"><img src="/assets/logos/stocks/AMZN.png" alt="" width="44" height="44"></span></i>
+          <i class="vsl" style="--a:315deg"><span class="stk"><img src="/assets/logos/stocks/GOOGL.png" alt="" width="44" height="44"></span></i>
+        </div>
+        <div class="vcore"><img src="/assets/brand/mark-skiff.svg" alt="" width="72" height="72"></div>
+      </div>
+    </section>
+
+    <section class="vsec vpan vnow" id="vault" aria-labelledby="vt-now">
+      <div class="vhead"><h2 id="vt-now" data-s="token.vault.title"></h2><p class="vsub" data-s="token.vault.sub"></p></div>
+      <div class="vbal">
+        <div class="vbm">
+          <span class="vusdg"><span class="stk"><img src="/assets/logos/tokens/usdg.png" alt="" width="64" height="64"></span></span>
+          <div class="vbl">
+            <span class="vlbl" data-s="token.vault.balance_label"></span>
+            <p class="vbn vault-only" id="vbal">&nbsp;</p>
+            <p class="vbn vbg no-vault" aria-hidden="true"><i></i><i></i></p>
+            <p class="vdrop"><span data-s="token.vault.drop_label"></span><span class="vda"><span class="stk"><img src="/assets/logos/tokens/usdg.png" alt="" width="20" height="20"></span><b id="vdrop"><i class="vgh" aria-hidden="true"></i></b></span></p>
+          </div>
+        </div>
+        <div class="vflow" aria-hidden="true">
+          <span class="stk vfu"><img src="/assets/logos/tokens/usdg.png" alt="" width="40" height="40"></span>
+          <span class="vfl"><i></i></span>
+          <span class="vfs"><span class="stk"><img src="/assets/logos/stocks/NVDA.png" alt="" width="40" height="40"></span><span class="stk"><img src="/assets/logos/stocks/SPY.png" alt="" width="40" height="40"></span><span class="stk"><img src="/assets/logos/stocks/TSLA.png" alt="" width="40" height="40"></span><span class="stk"><img src="/assets/logos/stocks/AAPL.png" alt="" width="40" height="40"></span></span>
+        </div>
+      </div>
+      <p class="vemp"><img src="/assets/brand/mark-skiff.svg" alt="" width="18" height="18"><span data-s="token.vault.empty"></span></p>
+      <div class="vaddr">
+        <span class="vlbl" data-s="token.vault.address_label"></span>
+        <span class="vpend no-vault" data-s="token.vault.address_pending"></span>
+        <span class="vav vault-only"><code class="mono" id="vvault">{vaultaddr}</code><a class="vxl" href="https://robinhoodchain.blockscout.com/address/{vaultaddr}" target="_blank" rel="noopener"><span data-s="token.vault.explorer"></span> ↗</a></span>
+      </div>
+    </section>
+
+    <section class="vsec vg2">
+      <div class="vpan vlog" aria-labelledby="vt-log">
+        <h2 id="vt-log" data-s="token.log.title"></h2>
+        <div class="vlogl" id="vlog">
+          <div class="vlempty" id="vlempty">
+            <ol class="vtl" aria-hidden="true">
+              <li><span class="vnode"><svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M3 6h11l-3-3M15 12H4l3 3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span><i></i><i class="sh"></i></li>
+              <li><span class="vnode"><svg width="18" height="18" viewBox="0 0 18 18" fill="none"><circle cx="9" cy="4.5" r="2" stroke="currentColor" stroke-width="1.5"/><circle cx="3.8" cy="13.5" r="2" stroke="currentColor" stroke-width="1.5"/><circle cx="14.2" cy="13.5" r="2" stroke="currentColor" stroke-width="1.5"/><path d="M8 6.4 5 11.6M10 6.4l3 5.2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></span><i></i><i class="sh"></i></li>
+            </ol>
+            <p class="vlmsg" data-s="token.log.empty"></p>
+          </div>
+        </div>
+      </div>
+      <div class="vpan vtimer" aria-labelledby="vt-tm">
+        <h2 id="vt-tm" data-s="token.timer.title"></h2>
+        <div class="vclock" id="vclock">
+          <div class="vc"><b data-u="d">–</b><span data-s="token.timer.d"></span></div>
+          <div class="vc"><b data-u="h">–</b><span data-s="token.timer.h"></span></div>
+          <div class="vc"><b data-u="m">–</b><span data-s="token.timer.m"></span></div>
+          <div class="vc"><b data-u="s">–</b><span data-s="token.timer.s"></span></div>
+        </div>
+        <p class="vtn no-drop" data-s="token.timer.prelaunch"></p>
+        <p class="vtn drop-only" data-s="token.timer.snapshot"></p>
+      </div>
+    </section>
+
+    <section class="vsec vg2">
+      <div class="vpan vcheck" aria-labelledby="vt-ck">
+        <h2 id="vt-ck" data-s="token.check.title"></h2>
+        <p class="vsub" data-s="token.check.sub"></p>
+        <form class="vform" id="vchk" novalidate>
+          <label class="vin"><input id="vq" type="text" inputmode="text" autocomplete="off" autocapitalize="off" spellcheck="false" maxlength="64" data-sa="placeholder:token.check.placeholder;aria-label:token.check.placeholder"></label>
+          <button class="btn-p" type="submit"><span data-s="token.check.button"></span></button>
+        </form>
+        <div class="vres" id="vres" aria-live="polite"></div>
+      </div>
+      <div class="vpan vca" aria-labelledby="vt-ca">
+        <h2 id="vt-ca" data-s="token.ca.title"></h2>
+        <p class="vcapre no-ca"><span class="vshield"><svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true"><path d="M9 2.2 3.5 4.3v4.2c0 3.4 2.3 6.1 5.5 7.3 3.2-1.2 5.5-3.9 5.5-7.3V4.3z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><path d="m6.6 9 1.7 1.7 3.2-3.4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span data-s="token.ca.prelaunch"></span></p>
+        <div class="vcarow ca-only"><code class="mono" id="vcaa">{ca}</code><button class="btn2 vcopy" type="button" id="vcopy"><span data-s="token.ca.copy"></span><span class="ok" aria-hidden="true" data-s="token.ca.copied"></span></button></div>
+      </div>
+    </section>
+
+    <section class="vsec vfaq" aria-labelledby="vt-faq">
+      <h2 id="vt-faq" data-s="token.faq.title"></h2>
+      <div class="vqa">
+        <details class="qa" open><summary><span data-s="token.faq.q1"></span><i aria-hidden="true">+</i></summary><p data-s="token.faq.a1"></p></details>
+        <details class="qa"><summary><span data-s="token.faq.q2"></span><i aria-hidden="true">+</i></summary><p data-s="token.faq.a2"></p></details>
+        <details class="qa"><summary><span data-s="token.faq.q3"></span><i aria-hidden="true">+</i></summary><p data-s="token.faq.a3"></p></details>
+        <details class="qa"><summary><span data-s="token.faq.q4"></span><i aria-hidden="true">+</i></summary><p data-s="token.faq.a4"></p></details>
+        <details class="qa"><summary><span data-s="token.faq.q5"></span><i aria-hidden="true">+</i></summary><p data-s="token.faq.a5"></p></details>
+        <details class="qa"><summary><span data-s="token.faq.q6"></span><i aria-hidden="true">+</i></summary><p data-s="token.faq.a6"></p></details>
+      </div>
+      <p class="geo vnote" data-s="token.note"></p>
+    </section>
+  </main>
+</div>
+<!--@footer-->
+<!--/@-->
+</body>
+</html>
