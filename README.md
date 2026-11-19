@@ -31,6 +31,10 @@ Pay from any of 23 chains in one signature. 0% fee.
 
 Hold $SKIFF, get stock tokens.
 
+## Public API
+
+Read-only, no key, no sign-up: quotes raced across 20+ sources, all 64 stock tokens, price history and the vault. See [API.md](API.md).
+
 ## Repo layout
 
 ```
