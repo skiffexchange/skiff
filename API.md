@@ -330,7 +330,6 @@ The API sends no CORS headers. Call it from your server, bot or backend, not fro
 - **Bots:** quote any stock token on demand in Telegram or Discord, with the best route and its fee lines.
 - **Dashboards:** 64 stocks with live prices, 24 h change, liquidity and chain-wide volume.
 - **Wallets:** show stock token prices and a real quote before your users swap.
-- **Alerts:** big moves, big buys, or a price crossing a level.
 - **Research:** liquidity and price impact across pools on Robinhood Chain.
 
 ## Links
