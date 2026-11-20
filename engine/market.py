@@ -18,6 +18,12 @@ from chain import http_json
 log = logging.getLogger("rhdex.market")
 POOLS_FILE = os.path.join(C.DATA, "pools.json")
 STOCKS = json.load(open(os.path.join(C.HERE, "stocks.json")))
+try:                                     # stocks listed by stockscan after this build (data volume), behind the shipped list
+    import stockscan as _SSC
+    _have = {s["address"].lower() for s in STOCKS} | {s["symbol"] for s in STOCKS}
+    STOCKS += [r for r in _SSC.listed_extra() if r["address"].lower() not in _have and r["symbol"] not in _have]
+except Exception:                        # never block the engine on the extra list
+    pass
 STOCK_BY_ADDR = {s["address"].lower(): s for s in STOCKS}
 STOCK_BY_SYM = {s["symbol"]: s for s in STOCKS}
 
@@ -34,6 +40,7 @@ def _load_cached():
             POOLS.update(d.get("pools") or {})
             PRICES.update({k: float(v) for k, v in (d.get("prices") or {}).items()})
             STATE["pools_at"] = d.get("at", 0)
+            STATE["read_stocks"] = set(d.get("readStocks") or [])
     except Exception:
         pass
 
@@ -42,7 +49,8 @@ def _save():
     try:
         tmp = POOLS_FILE + ".tmp"
         with _lock:
-            json.dump({"at": STATE["pools_at"], "pools": POOLS, "prices": PRICES}, open(tmp, "w"))
+            read = sorted(set(STATE.get("read_stocks") or ()) | set(STOCK_AT))
+            json.dump({"at": STATE["pools_at"], "pools": POOLS, "prices": PRICES, "readStocks": read}, open(tmp, "w"))
         os.replace(tmp, POOLS_FILE)
     except Exception:
         pass
@@ -124,6 +132,18 @@ def refresh_pools(only: list[dict] | None = None) -> int:
             STATE["pools_at"] = time.time()
         _save()
     return ok
+
+
+def add_stock(row: dict) -> None:
+    """a stock listed while the engine runs (stockscan): into the list and both maps at once, then its pools"""
+    a = row["address"].lower()
+    with _lock:
+        if a in STOCK_BY_ADDR or row["symbol"] in STOCK_BY_SYM:
+            return
+        STOCKS.append(row)
+        STOCK_BY_ADDR[a] = row
+        STOCK_BY_SYM[row["symbol"]] = row
+    refresh_pools([row])
 
 
 def stock_stale(addr: str) -> bool:
@@ -211,6 +231,14 @@ def loop(stop: threading.Event):
     last_pools = STATE["pools_at"]
     last_px = 0.0
     last_retry = 0.0
+    seen = STATE.get("read_stocks") or set()                 # stocks whose own pool list the cached index never read (a grown list): read now
+    fresh = [s for s in STOCKS if s["address"].lower() not in seen]
+    if fresh:
+        try:
+            refresh_pools(fresh)
+        except Exception as e:
+            log.warning("market: new stocks' pools: %s", e)
+    STATE["fresh_done"] = True                           # pricehist's first backfill waits for this (new stocks' price pools)
     while not stop.is_set():
         now = time.time()
         try:

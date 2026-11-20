@@ -16,6 +16,7 @@ Env (all optional locally):
   TG_BOT_TOKEN    Telegram bot token; empty = fake transport (messages land in the tg_outbox table only). Ignored unless TG_ENABLED=1.
   DEV=1           local dev sign-in via X-Dev-Wallet header, only from 127.0.0.1 (see auth.py). Refused in production (guard.py).
   BOARD=0         switch the /api/board refresher off (saves router budget while developing).
+  STOCKSCAN=0     switch the factory scan off (new Robinhood stock tokens, stockscan.py).
   TRADES=0        switch the Swap-log scanner off.
   LIMITS_ENABLED  0 (limit orders not built; owner decision pending, CoW is the candidate).
   RHDEX_DB        SQLite path (default site/data/rhdex.db).
@@ -138,6 +139,8 @@ def _addr_env(name: str) -> str:
 
 
 TOKEN_PAGE = (os.environ.get("TOKEN_PAGE") or "0").strip() == "1"
+# /portfolio + /api/me/portfolio + its links (data-plink) in the header, menu, dock, footer and ⌘K. Default OFF until the owner's.
+PORTFOLIO = (os.environ.get("PORTFOLIO") or "0").strip() == "1"
 TOKEN_TICKER = re.sub(r"[^A-Za-z0-9]", "", (os.environ.get("TOKEN_TICKER") or "").strip().lstrip("$"))[:16]   # "" = no ticker yet
 TOKEN_CA = _addr_env("TOKEN_CA")
 VAULT_ADDRESS = _addr_env("VAULT_ADDRESS")

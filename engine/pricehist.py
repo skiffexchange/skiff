@@ -121,7 +121,8 @@ def loop(stop: threading.Event) -> None:
     """the backfill once the market index is complete, then hourly: only price pools not filled yet (a new deepest pool, a stock added).
     The thread stays alive: /healthz counts every engine thread, so the backfill never makes the health check fail."""
     t0 = time.time()
-    while not stop.is_set() and not M.STATE.get("pools_at") and time.time() - t0 < 600:   # fresh volume: wait for the full pool index
+    while not stop.is_set() and not (M.STATE.get("pools_at") and M.STATE.get("fresh_done")) and time.time() - t0 < 600:   # wait for the full
+        # pool index (a fresh volume) and for the pools of stocks the cached index never read (stocks added since)
         stop.wait(3)
     while not stop.is_set():
         backfill(stop)

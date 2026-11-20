@@ -2,7 +2,7 @@
 
 Data: engine/us-listed.json — every US-listed ticker (Nasdaq Trader symbol directory, tools/us_listed_snapshot.py) -> the company's
 distinctive words (the security name without legal / share-class words: «Coinbase Global, Inc. - Class A Common Stock» -> «coinbase global»).
-Plus our 64 stocks (stocks.json).
+Plus our stocks (stocks.json + the ones stockscan.py listed).
 
 A token is a lookalike when, after peeling wrappers off its ticker (prefixes wt / w / x / s / b / r and suffixes x / on /.t, e.g. wtHOOD,
 NVDAx, sTSLA) and off its name («Wrapped», «Tokenized», «xStock», «Token»):

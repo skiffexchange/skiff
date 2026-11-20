@@ -510,5 +510,71 @@
 "address": "0x9e7abd3c9139d14e4c86dce0e455aab7a0c2fb3e",
 "v3wethPool": "0x2a3063e34c60253abb23c2442f4cdfbc5cbd02c2",
 "v3wethFee": 3000
+},
+{
+"symbol": "ANT",
+"name": "Anthropic",
+"kind": "stock",
+"address": "0xbbb6c29bcc3a1028a2b54310df73f4f7a3bcb373"
+},
+{
+"symbol": "COIN",
+"name": "Coinbase",
+"kind": "stock",
+"address": "0x6330d8c3178a418788df01a47479c0ce7ccf450b"
+},
+{
+"symbol": "BMNR",
+"name": "BitMine Immersion",
+"kind": "stock",
+"address": "0x9a7842eded60b0fe1e03eec342c82a397c821ed0"
+},
+{
+"symbol": "CBRS",
+"name": "Cerebras Systems",
+"kind": "stock",
+"address": "0x5c90450bbb4273d7b2f17cf6917aeb237a569679"
+},
+{
+"symbol": "CRWV",
+"name": "CoreWeave",
+"kind": "stock",
+"address": "0x5f10a1c971b69e47e059e1dc91901b59b3fb49c3"
+},
+{
+"symbol": "ORCL",
+"name": "Oracle",
+"kind": "stock",
+"address": "0xb0992820e760d836549ba69bc7598b4af75dee03"
+},
+{
+"symbol": "NBIS",
+"name": "Nebius Group",
+"kind": "stock",
+"address": "0x9d9c6684f596f66a64c030b93a886d51fd4d7931"
+},
+{
+"symbol": "NU",
+"name": "Nu Holdings",
+"kind": "stock",
+"address": "0x408c14038a04f7bd235329e26d2bf569ee20e250"
+},
+{
+"symbol": "MCD",
+"name": "McDonald's",
+"kind": "stock",
+"address": "0x2fdaa4604f10f4ae7f66fa48a174bcd25b1ece20"
+},
+{
+"symbol": "BULL",
+"name": "Webull",
+"kind": "stock",
+"address": "0xcef9027c7d6985b85f0ba431125073529a947a68"
+},
+{
+"symbol": "WDC",
+"name": "Western Digital",
+"kind": "stock",
+"address": "0xf52597345a8edf418bc4071b4a35112472277d3e"
 }
 ]

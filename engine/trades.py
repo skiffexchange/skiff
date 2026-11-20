@@ -175,6 +175,39 @@ def _pool_sets():
     return v3, v4
 
 
+def _catch_up(v3: dict, v4: dict, head: int, done: int, stop: threading.Event, ran_full: bool) -> None:
+    """pools the scanner never read (a stock listed since: stocks.json grew, or stockscan listed one): their last 24 h once, so volume,
+    big buys and the price line of a new stock are complete from the start (audit 20.11 M4). The pool ids read are kept in meta.
+    First run with this key: pools of stocks that already have volume rows count as read (the old list), every other pool is caught up."""
+    ids = set(v3) | set(v4)
+    raw = S.meta_get("trades_pools_seen")
+    if ran_full:                                   # the full 24 h backfill just read every pool
+        S.meta_set("trades_pools_seen", json.dumps(sorted(ids)))
+        return
+    if raw is None:
+        have = {r["stock"] for r in S.q("SELECT DISTINCT stock FROM volume")}
+        def known(p):
+            ss = [M.STOCK_BY_ADDR[a]["symbol"] for a in (p["base"], p["quote"]) if a in M.STOCK_BY_ADDR]
+            return bool(ss) and all(x in have for x in ss)
+        seen = {k for k, p in {**v3, **v4}.items() if known(p)}
+    else:
+        try:
+            seen = set(json.loads(raw))
+        except ValueError:
+            seen = set(ids)
+    new = ids - seen
+    if new:
+        nv3 = {k: p for k, p in v3.items() if k in new}
+        nv4 = {k: p for k, p in v4.items() if k in new}
+        t0, n = time.time(), 0
+        for a in range(max(head - BLOCKS_24H, 0), done + 1, STEP):
+            if stop.is_set():
+                return                                     # not marked read: caught up on the next start
+            n += _scan(a, min(a + STEP - 1, done), nv3, nv4) or 0
+        log.info("trades catch-up: %d new pools, 24 h, %d swaps in %.1fs", len(new), n, time.time() - t0)
+    S.meta_set("trades_pools_seen", json.dumps(sorted(ids | seen)))
+
+
 def loop(stop: threading.Event):
     while not stop.is_set() and not M.POOLS:
         stop.wait(3)
@@ -187,7 +220,8 @@ def loop(stop: threading.Event):
             done = int(S.meta_get("trades_scanned_to", "0") or 0)
             if done < head - BLOCKS_24H:
                 done = head - BLOCKS_24H
-            if not STATE["backfilled"] and head - done > STEP:
+            ran_full = not STATE["backfilled"] and head - done > STEP
+            if ran_full:
                 t0 = time.time()
                 while done < head and not stop.is_set():
                     b = min(done + STEP, head)
@@ -197,6 +231,7 @@ def loop(stop: threading.Event):
                     STATE["scanned_to"] = done
                 log.info("trades backfill to %d in %.1fs", done, time.time() - t0)
             STATE["backfilled"] = True
+            _catch_up(v3, v4, head, done, stop, ran_full)
             b = min(done + STEP, head)
             _scan(done + 1, b, v3, v4)
             S.meta_set("trades_scanned_to", str(b))

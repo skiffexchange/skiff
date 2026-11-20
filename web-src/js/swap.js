@@ -61,7 +61,7 @@ export function mountSwap(root, opts = {}) {
   let srcSeen = false;
 
   /* ---------- tokens ---------- */
-  const tokBtn = (el, tk) => { el.innerHTML = `${tokI(tk, 'ic', true, S.chains)}${esc(tk.symbol)}<span class="chev" aria-hidden="true">▾</span>`; el.setAttribute('aria-label', `${t(el.classList.contains('tp') ? 'swap.pick.title_pay' : 'swap.pick.title_get')} ${tk.symbol}`); };
+  const tokBtn = (el, tk) => { el.innerHTML = `${tokI(tk, 'ic', true, S.chains)}${esc(tk.symbol)}${tk.custom && tk.clash ? `<span class="fakeb">${esc(t('swap.pick.clash_badge', { symbol: tk.symbol }).split(' · ')[0].replace(tk.symbol, '').trim())}</span>` : ''}<span class="chev" aria-hidden="true">▾</span>`; el.setAttribute('aria-label', `${t(el.classList.contains('tp') ? 'swap.pick.title_pay' : 'swap.pick.title_get')} ${tk.symbol}`); };
   /** /app?to=0x… (the Buy of /tokens, a shared link): a network token from the engine's list, else read by address — always as «not on our list» */
   async function addrToken(a) {
     try { const n = await netTokens(); const x = n.all.find((y) => y.address === a); if (x) return x; } catch { /* list down: read the address */ }
@@ -69,7 +69,7 @@ export function mountSwap(root, opts = {}) {
       const d = await api('/api/token/' + a + '?soft=1', { cache: 300000 });
       if (!d || d.ok === false || d.listed) return null;
       return { chain: RH, address: d.address, symbol: String(d.symbol || 'TOKEN').slice(0, 16), name: String(d.name || d.symbol || '').slice(0, 48), decimals: d.decimals,
-        kind: 'custom', logo: /^(\/api\/img\/[0-9a-f]{24}|\/assets\/logos\/(net|chains|src)\/[0-9A-Za-z_.-]+\.(png|jpe?g|webp|gif|avif)(\?v=[0-9a-f]+)?)$/.test(d.logo || '') ? d.logo : null, price: null, custom: true, clash: !!d.clash, lookalike: !!d.lookalike };
+        kind: 'custom', logo: /^(\/api\/img\/[0-9a-f]{24}|\/assets\/logos\/(net|chains|src)\/[0-9A-Za-z_.-]+\.(png|jpe?g|webp|gif|avif)(\?v=[0-9a-f]+)?)$/.test(d.logo || '') ? d.logo : null, price: null, custom: true, clash: !!d.clash, lookalike: !!d.lookalike, rh: !!d.robinhood, real: d.real || null };
     } catch { return null; }
   }
   async function init() {
@@ -316,10 +316,10 @@ export function mountSwap(root, opts = {}) {
       else if (insufficient) { lbl = t('swap.cta.insufficient', { sym: S.from.symbol }); cls = 'warn'; note = `<div class="note warn">${th('swap.state.insufficient.note', { sym: S.from.symbol, ticker: S.to.symbol })}</div>`; }
       else if (m.stale) { lbl = t('swap.cta.fresh'); cls = ''; act = () => requote(0); note = `<div class="note info">${esc(t('swap.stale.sign_block'))}</div>`; }
       else { lbl = t('swap.cta.review'); cls = ''; act = customTk() ? confirmCustom : review; }
-      if (!note && customTk()) note = `<div class="note warn">${esc(customTk().symbol)} · ${esc(t('swap.pick.custom_badge'))}</div>`;
+      if (!note && customTk()) { const ck = customTk(); note = ck.clash ? '' : ck.rh ? `<div class="note warn">${esc(t('swap.custom.rh_unlisted'))}</div>` : `<div class="note warn">${esc(ck.symbol)} · ${esc(t('swap.pick.custom_badge'))}</div>`; }
     }
     cta.className = 'cta ' + cls; cta.textContent = lbl; cta.disabled = !act; cta.onclick = act;
-    S.note = note; nslot.innerHTML = '';
+    S.note = note; nslot.innerHTML = fakeNote();   // a fake of one of our stocks: the red note stays in every state (audit 20.11 M2)
     paintDet(c);
     const lk = det.querySelector('.note.warn'); if (lk) lk.innerHTML = lk.innerHTML.replace(esc(t('swap.state.insufficient.note_link')), `<button type="button" class="po2">${esc(t('swap.state.insufficient.note_link'))}</button>`);
     const po2 = det.querySelector('.po2'); if (po2) po2.onclick = () => pickPay(true);
@@ -413,6 +413,11 @@ export function mountSwap(root, opts = {}) {
 
   /* ---------- a pasted token that is not on our list: an explicit warning the person confirms before Review ---------- */
   const customTk = () => (S.to && S.to.custom ? S.to : S.from && S.from.custom ? S.from : null);
+  /** a token that uses the ticker of one of our stocks but is another contract: always a loud red note naming the real contract */
+  function fakeNote() {
+    const ck = [S.to, S.from].find((x) => x && x.custom && x.clash);
+    return ck ? `<div class="note bad fake"><b>${esc(t('swap.pick.clash_badge', { symbol: ck.symbol }).split(' · ')[0])}.</b> ${esc(t('swap.custom.clash', { symbol: ck.symbol, address: ck.real ? short(ck.real.address) : '' }))}</div>` : '';
+  }
   const okCustom = new Set();
   function confirmCustom() {
     const x = customTk(); if (!x) return review();
@@ -421,7 +426,7 @@ export function mountSwap(root, opts = {}) {
     const { el, close } = sheet(`<div class="sh-h"><h2>${esc(t('swap.custom.warn_title'))}</h2><button class="sh-x" data-close aria-label="${esc(t('swap.pick.close'))}">${X_SVG}</button></div>
       <div style="padding:4px 18px 18px"><div class="li" style="pointer-events:none">${tokI(x, 'ic')}<span><b>${esc(x.symbol)}</b><small>${esc(x.address)}</small></span></div>
       <p class="note warn">${esc(t('swap.custom.warn_body', { symbol: x.symbol, address: short(x.address) }))}</p>
-      ${x.clash ? `<p class="note bad">${esc(t('swap.custom.clash', { symbol: x.symbol }))}</p>` : ''}
+      ${x.clash ? `<p class="note bad"><b>${esc(t('swap.custom.clash', { symbol: x.symbol, address: x.real ? short(x.real.address) : '' }))}</b></p>` : ''}${x.rh ? `<p class="note warn">${esc(t('swap.custom.rh_unlisted'))}</p>` : ''}
       ${x.lookalike ? `<p class="note bad" title="${esc(t('swap.custom.lookalike_tip'))}">${esc(t('swap.custom.lookalike', { name: x.name || x.symbol, symbol: x.symbol }))} <span class="lkt">${esc(t('swap.custom.lookalike_tip'))}</span></p>` : ''}
       <p style="margin:12px 0"><a href="${esc(ex)}" target="_blank" rel="noopener noreferrer" style="color:var(--mint)">${esc(t('swap.custom.explorer'))} ↗</a></p>
       <label class="row2" style="font:400 14px/1.4 var(--f);color:var(--silver);gap:10px;align-items:flex-start"><input type="checkbox" data-ok style="margin-top:3px"> <span>${esc(t('swap.custom.confirm'))}</span></label>

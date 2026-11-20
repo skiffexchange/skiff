@@ -1,6 +1,6 @@
 # Skiff public API
 
-Skiff's price engine is open. Quotes raced across 20+ sources, all 64 stock tokens on Robinhood Chain, 24 h price history and the $SKIFF vault, as plain JSON.
+Skiff's price engine is open. Quotes raced across 20+ sources, every stock token we list on Robinhood Chain, 24 h price history and the $SKIFF vault, as plain JSON.
 
 - **Base URL:** `https://skiff.exchange`
 - **No key, no sign-up.** Every endpoint below is a read-only `GET`.
@@ -14,7 +14,7 @@ Transaction building and account endpoints are for the Skiff app and aren't part
 | Endpoint | What you get |
 |---|---|
 | [`GET /api/quote`](#get-apiquote) | every route for a swap, raced and checked, plus the best one |
-| [`GET /api/stocks-overview`](#get-apistocks-overview) | all 64 stock tokens: price, 24 h change, sparkline, liquidity, volume |
+| [`GET /api/stocks-overview`](#get-apistocks-overview) | every listed stock token: price, 24 h change, sparkline, liquidity, volume |
 | [`GET /api/price-history`](#get-apiprice-history) | 24 h price line for one stock |
 | [`GET /api/venues`](#get-apivenues) | the venues Skiff can route through |
 | [`GET /api/reach`](#get-apireach) | chains, bridges, DEXs and sources Skiff is wired into |
@@ -153,7 +153,7 @@ Cross-chain routes are quoted, not simulated, so they come in `quotedOnly` with 
 
 ## GET /api/stocks-overview
 
-All 64 stock and fund tokens on Robinhood Chain. Cached for 60 s.
+Every stock and fund token we list on Robinhood Chain. New Robinhood stock tokens are added by themselves once a pool holds $20k. Cached for 60 s.
 
 ```sh
 curl "https://skiff.exchange/api/stocks-overview"
@@ -328,7 +328,7 @@ The API sends no CORS headers. Call it from your server, bot or backend, not fro
 ## Ideas
 
 - **Bots:** quote any stock token on demand in Telegram or Discord, with the best route and its fee lines.
-- **Dashboards:** 64 stocks with live prices, 24 h change, liquidity and chain-wide volume.
+- **Dashboards:** every listed stock with live prices, 24 h change, liquidity and chain-wide volume.
 - **Wallets:** show stock token prices and a real quote before your users swap.
 - **Research:** liquidity and price impact across pools on Robinhood Chain.
 

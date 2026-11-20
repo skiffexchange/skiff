@@ -36,6 +36,7 @@ import reach  # noqa: E402
 import replay as RP  # noqa: E402
 import router  # noqa: E402
 import store as S  # noqa: E402
+import stockscan as SSC  # noqa: E402
 import tg  # noqa: E402
 import tokens as TK  # noqa: E402
 import network_tokens as NT  # noqa: E402
@@ -77,6 +78,8 @@ async def lifespan(_app):
         _start("ntokens", NT.loop)
     if C.flag("REACH") and not RP.enabled() and C.routing_enabled():        # /api/reach measurement (24 h); a replay engine reads the saved one from the shared meta
         _start("reach", reach.loop)
+    if C.flag("STOCKSCAN") and not RP.enabled():    # new Robinhood stock tokens from the factory, listed once a pool reaches the floor (stockscan.py)
+        _start("stockscan", SSC.loop)
     if C.TOKEN_PAGE and C.TOKEN_CA:                  # Vault: find (or read back) the launch time once, off the request path
         threading.Thread(target=VLT.launch, name="vault-launch", daemon=True).start()
     if tg.enabled() and tg.token():                   # Telegram is off until TG_ENABLED=1 
@@ -489,8 +492,15 @@ def api_token(req: Request, addr: str):
                 doc = {**doc, **{k: n[k] for k in ("symbol", "name", "decimals", "logo", "kind")}}
             elif doc.get("logo") and not NT._img_ok(doc["logo"]):
                 doc = {**doc, "logo": None}  # never an /api/img id that does not load
-            lk = LK.check(doc.get("symbol") or "", doc.get("name") or "")
-            doc = {**doc, "lookalike": lk["lookalike"], "clash": bool(doc.get("clash")) or lk["why"] == "our_stock_ticker"}
+            if SSC.genuine(doc["address"]):         # a real Robinhood stock token we do not list yet (no pool at the floor): never «fake»
+                doc = {**doc, "lookalike": False, "clash": False, "robinhood": True}
+            else:
+                lk = LK.check(doc.get("symbol") or "", doc.get("name") or "")
+                clash = bool(doc.get("clash")) or lk["why"] == "our_stock_ticker"
+                doc = {**doc, "lookalike": lk["lookalike"], "clash": clash}
+                real = (M.STOCK_BY_SYM.get(lk.get("ticker") or "") or M.STOCK_BY_SYM.get((doc.get("symbol") or "").strip().upper())) if clash else None
+                if real:                             # a fake of a listed stock: name the real contract next to the warning
+                    doc["real"] = {"symbol": real["symbol"], "name": real["name"], "address": real["address"].lower()}
         return J(doc, headers={"cache-control": "public, max-age=300"})
     except ValueError:
         return err("bad_address", 400)
@@ -763,7 +773,7 @@ a{color:#9fb4ff}code{background:#1c1f26;padding:2px 6px;border-radius:4px}</styl
 <p>The front end is not built yet (site/web/). API: <a href="/api/board">/api/board</a> · <a href="/api/trades">/api/trades</a> ·
 <a href="/api/stats">/api/stats</a> · <a href="/api/tokens">/api/tokens</a> · <a href="/api/venues">/api/venues</a> · <a href="/healthz">/healthz</a></p>
 </main></body></html>"""
-PAGES = {"/": "index", "/app": "app", "/faq": "faq"}
+PAGES = {"/": "index", "/app": "app", "/faq": "faq", "/portfolio": "portfolio"}
 
 
 _SAFE_NAME = re.compile(r"^[A-Za-z0-9_-]+(/[A-Za-z0-9_.-]+)*$")
@@ -782,13 +792,13 @@ def _page(name: str) -> str | None:
 
 
 def _html(path: str, status: int = 200) -> Response:
-    if C.TOKEN_PAGE:
+    if C.TOKEN_PAGE and C.PORTFOLIO:
         return FileResponse(path, status_code=status, media_type="text/html", headers={"cache-control": "no-store"})
-    try:   # Vault off: the same file without its Vault links (cached per file by mtime)
+    try:   # Vault / Portfolio off: the same file without their links (cached per file by mtime)
         mt = os.path.getmtime(path)
         c = _STRIPPED.get(path)
         if not c or c[0] != mt:
-            c = (mt, _no_vault(open(path, encoding="utf-8").read()))
+            c = (mt, _strip_off(open(path, encoding="utf-8").read()))
             _STRIPPED[path] = c
     except OSError:
         return _not_found()
@@ -872,6 +882,19 @@ def _no_vault(html: str) -> str:
     return _VLINK.sub("", _VLINK_LI.sub("", html))
 
 
+_PLINK_LI = re.compile(r'<li><a href="/portfolio"[^>]*\bdata-plink\b[^>]*>.*?</a></li>', re.S)
+_PLINK = re.compile(r'<a href="/portfolio"[^>]*\bdata-plink\b[^>]*>.*?</a>', re.S)
+
+
+def _strip_off(html: str) -> str:
+    """the links of pages that are switched off: Vault (TOKEN_PAGE=0), Portfolio (PORTFOLIO=0)"""
+    if not C.TOKEN_PAGE:
+        html = _no_vault(html)
+    if not C.PORTFOLIO:
+        html = _PLINK.sub("", _PLINK_LI.sub("", html))
+    return html
+
+
 def _token_page() -> Response:
     """/token (Vault): only with TOKEN_PAGE=1, else the plain 404. The server sets what the page shows before any script runs:
     data-ca / data-vault / data-drop = 0|1, the CA and the vault address, and every {ticker} slot: «$SKIFF» when TOKEN_TICKER is set,
@@ -897,7 +920,7 @@ def _token_page() -> Response:
     body = body.replace("{ca}", C.TOKEN_CA).replace("{vaultaddr}", C.VAULT_ADDRESS)
     if not live:
         body = body.replace("</head>", '<meta name="robots" content="noindex">\n</head>', 1)
-    r = HTMLResponse(body, headers={"cache-control": "no-store"})
+    r = HTMLResponse(_strip_off(body) if not C.PORTFOLIO else body, headers={"cache-control": "no-store"})   # Portfolio links off
     if not live:
         r.headers["x-robots-tag"] = "noindex"
     return r
@@ -913,7 +936,7 @@ def _not_found() -> Response:
             if _404["mtime"] != mt:
                 html = open(p404, encoding="utf-8").read()
                 _404.update(mtime=mt, body=_OGURL.sub("", _CANON.sub("", html)))
-            body404 = _404["body"] if C.TOKEN_PAGE else _no_vault(_404["body"])
+            body404 = _strip_off(_404["body"])
             r = HTMLResponse(body404, status_code=404, headers={"cache-control": "no-store"})
         except OSError:
             r = HTMLResponse("<!doctype html><title>Not found</title><h1>404</h1>", status_code=404, headers={"cache-control": "no-store"})
@@ -952,10 +975,14 @@ async def static(full: str, request: Request):
         return Response(status_code=301, headers={"location": c + ("?" + q if q else ""), "cache-control": "public, max-age=3600"})
     if c == "/token":
         return _token_page()
+    if c == "/portfolio" and not C.PORTFOLIO:
+        return _not_found()
     if c in PAGES:
         p = _page(PAGES[c])
         if p:
             return _html(p)
         return HTMLResponse(PLACEHOLDER.replace("{brand}", C.BRAND_NAME), headers={"cache-control": "no-store"})   # until web/ exists
     p = _page(c.strip("/"))
+    if not p and c.startswith("/stock/") and c[7:] in M.STOCK_BY_SYM:   # a stock listed after the build (stockscan): the shared template
+        p = _page("stock/index")
     return _html(p) if p else _not_found()

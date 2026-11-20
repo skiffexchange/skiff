@@ -62,5 +62,16 @@
  "DJT": "ok (cached)",
  "QUBT": "ok (cached)",
  "RCAT": "ok (cached)",
- "WYFI": "ok (cached)"
+ "WYFI": "ok (cached)",
+ "ANT": "ok fmp (20.11)",
+ "COIN": "ok nvstly (20.11)",
+ "BMNR": "ok fmp (20.11)",
+ "CBRS": "ok fmp (20.11)",
+ "CRWV": "ok fmp (20.11)",
+ "ORCL": "ok nvstly (20.11)",
+ "NBIS": "ok nvstly (20.11)",
+ "NU": "ok nvstly (20.11)",
+ "MCD": "ok nvstly (20.11)",
+ "BULL": "ok fmp (mark cropped from the wordmark) (20.11)",
+ "WDC": "ok nvstly (20.11)"
 }

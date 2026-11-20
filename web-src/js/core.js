@@ -137,6 +137,13 @@ export function tokens() {
   return TOK;
 }
 /** the «not on our list» badge; on narrow screens only its first part shows (prod-1 m3), the whole line stays in the title */
+/** the badge of a token that is not on our list: a fake of one of our stocks (clash) is red and says so; a real Robinhood stock token we do not
+ *  list yet (stockscan: thin pools) is neutral; anything else is the plain «Not on our list» */
+export function cbadgeFor(x) {
+  if (x && x.clash) { const full = t('swap.pick.clash_badge', { symbol: x.symbol }), i = full.indexOf(' · '); return `<span class="cbadge bad" title="${esc(full)}">${i > 0 ? `<b>${esc(full.slice(0, i))}</b><span class="cb2">${esc(full.slice(i))}</span>` : esc(full)}</span>`; }
+  if (x && x.rh) { const full = t('swap.pick.rh_badge'), i = full.indexOf(' · '); return `<span class="cbadge rh" title="${esc(full)}">${i > 0 ? `${esc(full.slice(0, i))}<span class="cb2">${esc(full.slice(i))}</span>` : esc(full)}</span>`; }
+  return cbadge();
+}
 export function cbadge() { const full = t('swap.pick.custom_badge'), i = full.indexOf(' · '); return `<span class="cbadge" title="${esc(full)}">${i > 0 ? `${esc(full.slice(0, i))}<span class="cb2">${esc(full.slice(i))}</span>` : esc(full)}</span>`; }
 export const isStock = (tk) => tk && (tk.kind === 'stock' || tk.kind === 'etf');
 // a network token's picture that does not load: its letter mark takes the same place (no broken image, no inline handler — CSP)

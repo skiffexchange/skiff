@@ -33,7 +33,7 @@ Hold $SKIFF, get stock tokens.
 
 ## Public API
 
-Read-only, no key, no sign-up: quotes raced across 20+ sources, all 64 stock tokens, price history and the vault. See [API.md](API.md).
+Read-only, no key, no sign-up: quotes raced across 20+ sources, every stock token we list on Robinhood Chain (new Robinhood stock tokens are picked up by themselves), price history and the vault. See [API.md](API.md).
 
 ## Repo layout
 

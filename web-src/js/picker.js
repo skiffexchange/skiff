@@ -1,5 +1,5 @@
 // Token picker: instant, from the local /api/tokens index (cached). Search by ticker, name or address. Icons everywhere a ticker is.
-import { t, esc, sheet, tokens, netTokens, cbadge, tokI, chainLogo, nf, X_SVG, SEARCH_SVG, isStock, api, errLine, short } from './core.js';
+import { t, esc, sheet, tokens, netTokens, cbadge, cbadgeFor, tokI, chainLogo, nf, X_SVG, SEARCH_SVG, isStock, api, errLine, short } from './core.js';
 
 const POPULAR = ['NVDA', 'TSLA', 'SPY', 'QQQ', 'AAPL', 'SPCX', 'GOOGL', 'MSFT', 'AMZN', 'META'];
 export function search(list, q) {
@@ -35,7 +35,7 @@ export async function pick({ side, cross = false, chain = null, chainsFirst = fa
     const inp = el.querySelector('input'), list = el.querySelector('.list');
     netTokens().then((n) => { NTL = n; if (tab === 'tokens' || q) draw(); }).catch(() => { ntErr = true; if (tab === 'tokens') draw(); });
     // a row of a token that is not on our list: its own symbol and name, the «not on our list» badge, never a stock's look
-    const netRow = (x, i) => `<button class="li nt ${i === sel ? 'sel' : ''}" role="option" id="pk-o${i}" aria-selected="${i === sel}" tabindex="-1" data-i="${i}">${tokI(x, 'ic')}<span><b>${esc(x.symbol)}${x.name && x.name.toLowerCase() !== x.symbol.toLowerCase() ? ` <span class="tn">${esc(x.name)}</span>` : ''}</b><small>${cbadge()}</small></span><span class="r">${x.price != null ? esc(t('swap.pick.price', { price: nf(x.price, x.price < 1 ? 6 : x.price < 10 ? 4 : 2) })) : `<small>${t('swap.pick.no_price')}</small>`}</span></button>`;
+    const netRow = (x, i) => `<button class="li nt ${i === sel ? 'sel' : ''}" role="option" id="pk-o${i}" aria-selected="${i === sel}" tabindex="-1" data-i="${i}">${tokI(x, 'ic')}<span><b>${esc(x.symbol)}${x.name && x.name.toLowerCase() !== x.symbol.toLowerCase() ? ` <span class="tn">${esc(x.name)}</span>` : ''}</b><small>${cbadgeFor(x)}</small></span><span class="r">${x.price != null ? esc(t('swap.pick.price', { price: nf(x.price, x.price < 1 ? 6 : x.price < 10 ? 4 : 2) })) : `<small>${t('swap.pick.no_price')}</small>`}</span></button>`;
     const kindOk = (x) => tab === 'all' || (tab === 'stocks' && x.kind === 'stock') || (tab === 'funds' && x.kind === 'etf') || (tab === 'crypto' && x.kind === 'crypto') || (tab === 'stable' && x.kind === 'stable');
     function draw() {
       let base = T.list.filter((x) => x.chain === ch && (side !== 'get' || isStock(x) || x.chain === 4663));
@@ -75,11 +75,11 @@ export async function pick({ side, cross = false, chain = null, chainsFirst = fa
       if (e) { list.innerHTML = `<div class="empty"><b>${esc(t('swap.pick.none_title', { q: a.slice(0, 10) + '…' }))}</b>${esc(e.code === 'not_a_token' ? t('swap.pick.not_token') : e.code === 'rate_limited' ? errLine(e) : t('swap.pick.lookup_failed'))}</div>`; return; }
       const x = d.listed ? (T.list.find((y) => y.chain === 4663 && y.address === d.address) || null) : {
         chain: 4663, address: d.address, symbol: String(d.symbol || 'TOKEN').slice(0, 16), name: String(d.name || d.symbol || '').slice(0, 48),
-        decimals: d.decimals, kind: 'custom', logo: /^(\/api\/img\/[0-9a-f]{24}|\/assets\/logos\/(net|chains|src)\/[0-9A-Za-z_.-]+\.(png|jpe?g|webp|gif|avif)(\?v=[0-9a-f]+)?)$/.test(d.logo || '') ? d.logo : null, price: null, custom: true, clash: !!d.clash, lookalike: !!d.lookalike };
+        decimals: d.decimals, kind: 'custom', logo: /^(\/api\/img\/[0-9a-f]{24}|\/assets\/logos\/(net|chains|src)\/[0-9A-Za-z_.-]+\.(png|jpe?g|webp|gif|avif)(\?v=[0-9a-f]+)?)$/.test(d.logo || '') ? d.logo : null, price: null, custom: true, clash: !!d.clash, lookalike: !!d.lookalike, rh: !!d.robinhood, real: d.real || null };
       if (!x) { list.innerHTML = `<div class="empty">${esc(t('swap.pick.lookup_failed'))}</div>`; return; }
       rows = [x]; sel = 0;
       inp.setAttribute('aria-activedescendant', 'pk-o0');
-      list.innerHTML = `<button class="li sel" role="option" id="pk-o0" aria-selected="true" tabindex="-1" data-i="0">${tokI(x, 'ic', true, chains)}<span><b>${esc(x.symbol)}</b><small>${x.custom ? `<span class="cbadge">${esc(t('swap.pick.custom_badge'))}</span>` : esc(t('swap.pick.row_sub', { name: x.name, chain: (chains[4663] || {}).name || '' }))}</small></span><span class="r"><small>${esc(short(x.address))}</small></span></button>`;
+      list.innerHTML = `<button class="li sel" role="option" id="pk-o0" aria-selected="true" tabindex="-1" data-i="0">${tokI(x, 'ic', true, chains)}<span><b>${esc(x.symbol)}</b><small>${x.custom ? cbadgeFor(x) : esc(t('swap.pick.row_sub', { name: x.name, chain: (chains[4663] || {}).name || '' }))}</small></span><span class="r"><small>${esc(short(x.address))}</small></span></button>${x.clash ? `<p class="note bad fake">${esc(t('swap.custom.clash', { symbol: x.symbol, address: x.real ? short(x.real.address) : '' }))}</p>` : ''}`;
     }
     const choose = (x) => { done = true; resolve(x); close(); };
     list.addEventListener('click', (e) => { const b = e.target.closest('[data-i]'); if (b) choose(rows[+b.dataset.i]); });

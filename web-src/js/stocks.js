@@ -36,7 +36,7 @@ const lab = { chg: ['stocks.cols.change', 'stocks.cols.chg'], vol: ['stocks.cols
 for (const [k, ids] of Object.entries(lab)) { const id = ids.find((i) => has(i)); const b = $(`#sxh [data-k="${k}"] button`); if (b && id && !b.textContent.trim()) b.textContent = t(id); }
 const paintSort = () => $$('#sxh [data-k]').forEach((h) => h.setAttribute('aria-sort', h.dataset.k === sortK ? (sortDir > 0 ? 'ascending' : 'descending') : 'none'));
 $$('#sxh [data-k] button').forEach((b) => b.addEventListener('click', () => { const k = b.parentElement.dataset.k; if (sortK === k) sortDir = -sortDir; else { sortK = k; sortDir = k === 'name' ? 1 : -1; } paintSort(); draw(); }));
-$('#rows').innerHTML = Array.from({ length: +$('#rows').dataset.count || 64 }, () => '<div class="r sk-r"><span class="nmc"><span class="sk" style="width:36px;height:36px;border-radius:50%"></span><span class="sk" style="width:140px;height:14px"></span></span></div>').join('');
+$('#rows').innerHTML = Array.from({ length: +$('#rows').dataset.count || 75 }, () => '<div class="r sk-r"><span class="nmc"><span class="sk" style="width:36px;height:36px;border-radius:50%"></span><span class="sk" style="width:140px;height:14px"></span></span></div>').join('');
 (async () => {
   let T, s;
   try { [T, s] = await Promise.all([tokens(), api('/api/stocks-overview', { cache: 60000 }).catch(() => null)]); }
